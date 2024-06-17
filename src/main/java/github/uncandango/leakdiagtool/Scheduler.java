@@ -2,9 +2,9 @@ package github.uncandango.leakdiagtool;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.TickTask;
-import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.neoforged.common.util.LogicalSidedProvider;
+import net.neoforged.event.server.ServerStoppedEvent;
+import net.neoforged.fml.LogicalSide;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
