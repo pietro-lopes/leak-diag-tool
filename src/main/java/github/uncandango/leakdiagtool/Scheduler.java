@@ -1,10 +1,8 @@
 package github.uncandango.leakdiagtool;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.TickTask;
-import net.neoforged.common.util.LogicalSidedProvider;
-import net.neoforged.event.server.ServerStoppedEvent;
 import net.neoforged.fml.LogicalSide;
+import net.neoforged.neoforge.common.util.LogicalSidedProvider;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -38,11 +36,11 @@ public enum Scheduler {
                         .execute(task), seconds, TimeUnit.SECONDS);
     }
 
-    public void addCustom(String id, Future<?> future){
+    public void addCustom(String id, Future<?> future) {
         scheduledTasks.putIfAbsent(id, future);
     }
 
-    public void schedule(String taskId, Runnable task, Long seconds, LogicalSide side){
+    public void schedule(String taskId, Runnable task, Long seconds, LogicalSide side) {
         var future = createTask(task, seconds, side);
         cancelTask(taskId);
         scheduledTasks.putIfAbsent(taskId, future);

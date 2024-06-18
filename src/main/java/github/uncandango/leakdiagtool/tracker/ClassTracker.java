@@ -77,7 +77,7 @@ public enum ClassTracker {
     public void add(LeakDiagTool.ValidClass type, Object object) {
         type.getClasses().stream()
                 .filter(clazz -> clazz.isAssignableFrom(object.getClass()))
-                .forEach(clazz -> add(clazz,object));
+                .forEach(clazz -> add(clazz, object));
     }
 
 }

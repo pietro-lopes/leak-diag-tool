@@ -1,43 +1,38 @@
 package github.uncandango.leakdiagtool;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import github.uncandango.leakdiagtool.commands.LDTCommands;
+import github.uncandango.leakdiagtool.leaks.FakePlayer;
 import github.uncandango.leakdiagtool.tracker.ClassTracker;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.server.level.ServerLevel;
-import net.neoforged.client.event.RegisterClientCommandsEvent;
-import net.neoforged.common.MinecraftForge;
-import net.neoforged.common.util.FakePlayerFactory;
-import net.neoforged.common.util.LazyOptional;
-import net.neoforged.event.RegisterCommandsEvent;
-import net.neoforged.event.TickEvent;
-import net.neoforged.event.entity.player.PlayerEvent;
-import net.neoforged.event.level.ChunkEvent;
-import net.neoforged.event.level.LevelEvent;
-import net.neoforged.event.server.ServerStoppedEvent;
-import net.neoforged.event.server.ServerStoppingEvent;
-import net.neoforged.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.ChunkEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.slf4j.Logger;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static github.uncandango.leakdiagtool.commands.LDTCommands.heapDumpScheduledOnServerShutdown;
 
 @Mod(LeakDiagTool.MOD_ID)
-public final class LeakDiagTool {
+public class LeakDiagTool {
     public static final String MOD_ID = "leakdiagtool";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean leakTest = true;
 
-    public LeakDiagTool() {
-        final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        final IEventBus eventBus = MinecraftForge.EVENT_BUS;
+    public LeakDiagTool(IEventBus eventModBus, ModContainer modContainer) {
+        var eventBus = NeoForge.EVENT_BUS;
         eventBus.addListener(LeakDiagTool::registerCommands);
         eventBus.addListener(LeakDiagTool::registerClientCommands);
         eventBus.addListener(LeakDiagTool::unloadLevel);
@@ -46,18 +41,14 @@ public final class LeakDiagTool {
         eventBus.addListener(LeakDiagTool::playerLogout);
         eventBus.addListener(Scheduler.INSTANCE::onShutdown);
         eventBus.addListener(LeakDiagTool::closedServer);
-//        eventBus.addListener(LeakDiagTool::levelTick); // leak test of FakePlayer
+
+        if (leakTest) {
+            // Fake Player does not handle disconnection properly and leaks
+            eventBus.addListener(FakePlayer::levelTick);
+        }
     }
 
-    // leak test of FakePlayer
-//    private static void levelTick(TickEvent.LevelTickEvent event){
-//        if (event.level.isClientSide()) return;
-//        if (event.level.getServer().getTickCount() % 100 == 0) { // runs every 5s
-//            var randomUUID = UUID.randomUUID();
-//            var profile = new GameProfile(randomUUID, "Player" + event.level.getServer().getTickCount());
-//            FakePlayerFactory.get((ServerLevel) event.level, profile);
-//        }
-//    }
+
 
     private static void playerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         ClassTracker.LEAKING.add(ValidClass.PLAYER, event.getEntity());
@@ -96,14 +87,14 @@ public final class LeakDiagTool {
         SERVER("net.minecraft.server.dedicated.DedicatedServer", "net.minecraft.client.server.IntegratedServer", "net.minecraft.gametest.framework.GameTestServer"),
         PLAYER("net.minecraft.client.player.AbstractClientPlayer", "net.minecraft.server.level.ServerPlayer");
 
-        private final LazyOptional<Set<Class<?>>> classes;
+        private final Lazy<Set<Class<?>>> classes;
 
         ValidClass(String... classNames) {
-            this.classes = LazyOptional.of(() -> Stream.of(classNames).map(Utils::safeGetClass).filter(Objects::nonNull).collect(Collectors.toSet()));
+            this.classes = Lazy.of(() -> Stream.of(classNames).map(Utils::safeGetClass).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         public Set<Class<?>> getClasses() {
-            return classes.orElse(Set.of());
+            return classes.get();
         }
     }
 }

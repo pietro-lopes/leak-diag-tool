@@ -1,7 +1,7 @@
 package github.uncandango.leakdiagtool;
 
 import net.minecraft.network.Connection;
-import net.neoforged.common.util.FakePlayer;
+import net.neoforged.neoforge.common.util.FakePlayer;
 
 import java.util.Collections;
 import java.util.Set;

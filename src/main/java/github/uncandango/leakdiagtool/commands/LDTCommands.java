@@ -58,7 +58,7 @@ public final class LDTCommands {
                                 .executes(cmd -> dumpHeap(cmd.getSource()))
                                 .then(Commands.literal("schedule_in_minutes")
                                         .then(Commands.argument("time_in_minutes", IntegerArgumentType.integer())
-                                        .executes(cmd -> scheduleHeapDump(cmd.getSource(), cmd.getArgument("time_in_minutes", Integer.class)))))
+                                                .executes(cmd -> scheduleHeapDump(cmd.getSource(), cmd.getArgument("time_in_minutes", Integer.class)))))
                                 .then(Commands.literal("schedule_on_exit")
                                         .executes(cmd -> scheduleHeapDump(cmd.getSource(), -1)))
 
@@ -69,11 +69,11 @@ public final class LDTCommands {
         );
     }
 
-    private static int scheduleHeapDump(CommandSourceStack source, Integer minutes){
-        if (minutes == -1){
-            if (FMLEnvironment.dist.isClient()){
+    private static int scheduleHeapDump(CommandSourceStack source, Integer minutes) {
+        if (minutes == -1) {
+            if (FMLEnvironment.dist.isClient()) {
                 ClientEvents.heapDumpScheduledOnClientExit = !ClientEvents.heapDumpScheduledOnClientExit;
-                if (ClientEvents.heapDumpScheduledOnClientExit){
+                if (ClientEvents.heapDumpScheduledOnClientExit) {
                     source.sendSystemMessage(Component.literal("Heap dump scheduled to be run on world exit for this session."));
                 } else {
                     source.sendSystemMessage(Component.literal("Heap dump schedule on world exit now off."));
@@ -81,7 +81,7 @@ public final class LDTCommands {
                 return 1;
             } else {
                 heapDumpScheduledOnServerShutdown = !heapDumpScheduledOnServerShutdown;
-                if (heapDumpScheduledOnServerShutdown){
+                if (heapDumpScheduledOnServerShutdown) {
                     source.sendSystemMessage(Component.literal("Heap dump scheduled to be run on server shutdown."));
                     source.sendSystemMessage(Component.literal("Be aware to disable any auto rescheduler/task killer from your hoster.").withStyle(ChatFormatting.GOLD));
                 } else {
@@ -97,7 +97,7 @@ public final class LDTCommands {
     }
 
     private static int sendObjectsReport(CommandSourceStack source, ClassTracker type) {
-        if (MxBean.INSTANCE.isExplicitGcDisabled()){
+        if (MxBean.INSTANCE.isExplicitGcDisabled()) {
             var message = Component.literal("Explicit GC is disabled.\nPlease remove the following VM args: \"-XX:+DisableExplicitGC\"").withStyle(ChatFormatting.RED);
             source.sendFailure(message);
             return 0;
@@ -140,11 +140,11 @@ public final class LDTCommands {
         return false;
     }
 
-    public static void dumpHeap(){
+    public static void dumpHeap() {
         dumpHeap(Optional.empty());
     }
 
-    private static int dumpHeap(CommandSourceStack source){
+    private static int dumpHeap(CommandSourceStack source) {
         LeakDiagTool.LOGGER.info("Running dump heap...");
         var message = Component.literal("Running dump heap in 5 seconds... this may take a few minutes on large modpacks.").withStyle(ChatFormatting.GOLD);
         source.sendSystemMessage(message);
