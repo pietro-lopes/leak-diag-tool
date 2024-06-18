@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "github.uncandango.leakdiagtool.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "client": [
   ],
@@ -9,7 +9,8 @@
     "ChunkAccessMixin",
     "LevelMixin",
     "MinecraftServerMixin",
-    "PlayerMixin"
+    "PlayerMixin",
+    "leaks.FakePlayerFactoryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
