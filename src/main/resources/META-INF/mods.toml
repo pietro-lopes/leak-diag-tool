@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "leakdiagtool"
+version = "${version}"
+displayName = "Leak Diagnostic Tool"
+authors = "Uncandango"
+description = '''
+This mod helps detection of memory leaks!
+'''
+#logoFile = ""
+
+[[dependencies.leakdiagtool]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.leakdiagtool]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"

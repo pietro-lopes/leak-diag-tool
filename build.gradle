@@ -1,0 +1,162 @@
+plugins {
+    id 'dev.architectury.loom' version '1.6-SNAPSHOT'
+    id 'maven-publish'
+}
+
+group = project.maven_group
+version = project.mod_version
+
+base {
+    archivesName = project.archives_name
+}
+
+loom {
+    forge {
+        mixinConfig 'leakdiagtool.mixins.json'
+    }
+    runs {
+        client {
+            vmArgs "-Dforge.logging.console.level=debug"
+            vmArgs '-XX:+AllowEnhancedClassRedefinition'
+//            vmArgs '-XX:HotswapAgent=fatjar'
+        }
+    }
+}
+
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+//    maven {
+//        url "https://cursemaven.com"
+//        content {
+//            includeGroup "curse.maven"
+//        }
+//    }
+}
+
+dependencies {
+    minecraft "net.minecraft:minecraft:$project.minecraft_version"
+    mappings loom.officialMojangMappings()
+    forge "net.minecraftforge:forge:$project.forge_version"
+//    modCompileOnly("curse.maven:citadel-331936:5143956")
+//    modCompileOnly("curse.maven:createaddition-439890:5099752")
+//    modCompileOnly("curse.maven:railcraft-reborn-901491:5242853")
+//    modCompileOnly("curse.maven:kubejs-238086:5268032")
+//    modCompileOnly("curse.maven:tfc-thermal-deposits-962578:5317918")
+//    modCompileOnly("curse.maven:ftb-xmod-compat-889915:5257897")
+//    modCompileOnly("curse.maven:jei-238222:5101366")
+//    modCompileOnly("curse.maven:gregtechceu-modern-890405:5253480")
+//    modCompileOnly("curse.maven:patchouli-306770:4966125")
+//    modCompileOnly("curse.maven:applied-energistics-2-223794:5330978")
+//    modCompileOnly("curse.maven:kubejs-enderio-910379:4872849") { transitive = false }
+//    modCompileOnly("curse.maven:ftb-quests-forge-289412:5315015")
+//    modCompileOnly("curse.maven:blue-skies-312918:5010316")
+//
+//    // modCompileOnly("blank:flywheel-forge:1.20.1-0.6.10-7")
+//    modCompileOnly("com.jozufozu.flywheel:flywheel-forge-1.20.1:0.6.10-7")
+//
+//    modCompileOnly("curse.maven:oculus-581495:5299671")
+//
+//    modCompileOnly("curse.maven:zeta-968868:5254672")
+//    modCompileOnly("curse.maven:quark-243121:5346894")
+//
+//    modCompileOnly("curse.maven:ars-nouveau-401955:5190105")
+//
+//    modCompileOnly("curse.maven:applied-energistics-2-wireless-terminals-459929:5217955")
+//
+//    modCompileOnly("curse.maven:productivebees-377897:5381132")
+//    modCompileOnly("curse.maven:creeper-overhaul-561625:5125710")
+//
+//    modCompileOnly('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4') { transitive = false }
+//    modCompileOnly("blank:mclib:20")
+//
+//
+//    modCompileOnly("curse.maven:enderman-overhaul-574409:5019620")
+//
+//    modCompileOnly("curse.maven:irons-spells-n-spellbooks-855414:5341949")
+//
+//    modCompileOnly("curse.maven:minecolonies-245506:5346155")
+//
+//    modCompileOnly("curse.maven:create-328085:4835191")
+//
+//    modCompileOnly("curse.maven:jei-238222:5101366")
+//    modCompileOnly("curse.maven:create-steam-n-rails-688231:5331300")
+//
+//    modCompileOnly("curse.maven:pneumaticcraft-repressurized-281849:5279325")
+//
+//    modCompileOnly("curse.maven:ftb-chunks-forge-314906:5267364")
+//
+//    modCompileOnly("curse.maven:just-enough-resources-jer-240630:5057220")
+//
+//    modCompileOnly("curse.maven:just-enough-archaeology-890755:5324518")
+//
+////    modCompileOnly("curse.maven:corail-tombstone-243707:5395076")
+//    modCompileOnly("curse.maven:corail-tombstone-243707:5201363")
+//
+//    modCompileOnly("curse.maven:journeymap-32274:5293067")
+//
+//    modCompileOnly("curse.maven:mekanism-268560:5125665")
+//
+////    modCompileOnly("curse.maven:ldlib-626676:5252086")
+//    modCompileOnly("curse.maven:ldlib-626676:5343863")
+//
+//    modCompileOnly("curse.maven:jade-324717:5339264")
+//
+//    modCompileOnly("curse.maven:easy-villagers-400514:5153629")
+//
+//    modCompileOnly("curse.maven:security-craft-64760:5207771")
+//
+//    modCompileOnly("curse.maven:distant-horizons-508933:5390046")
+//
+//    modCompileOnly("curse.maven:ice-and-fire-dragons-264231:5122408")
+//
+//    modCompileOnly("curse.maven:ambientsounds-254284:5345142")
+//    modCompileOnly("curse.maven:xaeros-minimap-263420:5262365")
+////    modCompileOnly("curse.maven:xaeros-minimap-263420:5394772")
+////    modCompileOnly("curse.maven:xaeros-world-map-317780:5394829")
+//    modCompileOnly("curse.maven:xaeros-world-map-317780:5262424")
+//    modCompileOnly("curse.maven:ftb-quests-forge-289412:5418359")
+//    modCompileOnly("curse.maven:spark-361579:4738952")
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('META-INF/mods.toml') {
+        expand version: project.version
+    }
+}
+
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 17
+}
+
+// Configure Maven publishing.
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}
