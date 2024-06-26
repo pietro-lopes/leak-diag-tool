@@ -3,8 +3,11 @@ package github.uncandango.leakdiagtool.tracker;
 import java.lang.ref.WeakReference;
 
 public class IdentityWeakReference<T> extends WeakReference<T> {
+    private final int referentHash;
+
     public IdentityWeakReference(T referent) {
         super(referent);
+        referentHash = referent.hashCode();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -16,9 +19,9 @@ public class IdentityWeakReference<T> extends WeakReference<T> {
         return this.refersTo((T) obj);
     }
 
+
     @Override
     public int hashCode() {
-        var referent = this.get();
-        return referent != null ? referent.hashCode() : 0;
+        return referentHash;
     }
 }

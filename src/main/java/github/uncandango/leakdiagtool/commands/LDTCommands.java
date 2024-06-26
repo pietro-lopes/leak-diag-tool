@@ -7,7 +7,9 @@ import github.uncandango.leakdiagtool.LeakDiagTool;
 import github.uncandango.leakdiagtool.Scheduler;
 import github.uncandango.leakdiagtool.events.ClientEvents;
 import github.uncandango.leakdiagtool.tracker.ClassTracker;
+import github.uncandango.leakdiagtool.tracker.Generation;
 import github.uncandango.leakdiagtool.tracker.MxBean;
+import github.uncandango.leakdiagtool.tracker.ObjectTracker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -41,8 +43,10 @@ public final class LDTCommands {
                                         .then(Commands.argument("time_in_minutes", IntegerArgumentType.integer())
                                                 .executes(cmd -> scheduleHeapDump(cmd.getSource(), cmd.getArgument("time_in_minutes", Integer.class)))))
                                 .then(Commands.literal("schedule_on_exit")
-                                        .executes(cmd -> scheduleHeapDump(cmd.getSource(), -1)))
-                        )
+                                        .executes(cmd -> scheduleHeapDump(cmd.getSource(), -1))))
+                        .then(Commands.literal("bump_generation")
+                                .then(Commands.argument("type", EnumArgument.enumArgument(ObjectTracker.ValidClass.class))
+                                        .executes(cmd -> bumpGeneration(cmd.getSource(), cmd.getArgument("type", ObjectTracker.ValidClass.class)))))
 
         );
     }
@@ -60,13 +64,21 @@ public final class LDTCommands {
                                         .then(Commands.argument("time_in_minutes", IntegerArgumentType.integer())
                                                 .executes(cmd -> scheduleHeapDump(cmd.getSource(), cmd.getArgument("time_in_minutes", Integer.class)))))
                                 .then(Commands.literal("schedule_on_exit")
-                                        .executes(cmd -> scheduleHeapDump(cmd.getSource(), -1)))
-
-
-                        )
+                                        .executes(cmd -> scheduleHeapDump(cmd.getSource(), -1))))
+                        .then(Commands.literal("bump_generation")
+                                .then(Commands.argument("type", EnumArgument.enumArgument(ObjectTracker.ValidClass.class))
+                                        .executes(cmd -> bumpGeneration(cmd.getSource(), cmd.getArgument("type", ObjectTracker.ValidClass.class)))))
 
 
         );
+    }
+
+    private static int bumpGeneration(CommandSourceStack source, ObjectTracker.ValidClass type) {
+        type.bumpGeneration(Generation.EvolutionEvent.CUSTOM_TRIGGER);
+        var currentGen = type.getCurrentGeneration();
+        var message = Component.translatable("Bumped generation of %s to %s", type.name(), currentGen.getNumber()).withStyle(ChatFormatting.GREEN);
+        source.sendSystemMessage(message);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int scheduleHeapDump(CommandSourceStack source, Integer minutes) {

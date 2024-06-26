@@ -1,11 +1,13 @@
 package github.uncandango.leakdiagtool.mixin;
 
-import github.uncandango.leakdiagtool.LeakDiagTool;
 import github.uncandango.leakdiagtool.tracker.ClassTracker;
+import github.uncandango.leakdiagtool.tracker.ObjectTracker;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,9 +20,7 @@ import java.util.function.Supplier;
 public class LevelMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    void ldt$grabLevelInstance(WritableLevelData arg, ResourceKey arg2, RegistryAccess arg3, Holder arg4, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
-        LeakDiagTool.ValidClass.LEVEL.getClasses().forEach(clazz -> {
-            if (clazz.isAssignableFrom(this.getClass())) ClassTracker.LOADED.add(clazz, this);
-        });
+    void ldt$grabLevelInstance(WritableLevelData arg, ResourceKey<Level> arg2, RegistryAccess arg3, Holder<DimensionType> arg4, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
+        ObjectTracker.add(ClassTracker.LOADED, ObjectTracker.ValidClass.LEVEL, this);
     }
 }
