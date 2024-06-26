@@ -3,10 +3,10 @@ package github.uncandango.leakdiagtool.tracker;
 import github.uncandango.leakdiagtool.LeakDiagTool;
 import net.minecraft.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum ClassTracker {
@@ -14,21 +14,21 @@ public enum ClassTracker {
     LEAKING;
 
     private static long lastTimeRanGC = 0;
-    private final Map<Class<?>, Set<IdentityWeakReference<Object>>> map;
+    private final Map<Class<?>, List<ObjectTracker>> map;
 
     ClassTracker() {
         this.map = new ConcurrentHashMap<>();
     }
 
-    public void add(Class<?> clazz, Object object) {
+    public void add(Class<?> clazz, ObjectTracker object) {
         map.computeIfPresent(clazz, (key, value) -> {
-            value.add(new IdentityWeakReference<>(object));
+            value.add(object);
             return value;
         });
         map.computeIfAbsent(clazz, (key) -> {
-            var newSet = new HashSet<IdentityWeakReference<Object>>();
-            newSet.add(new IdentityWeakReference<>(object));
-            return newSet;
+            List<ObjectTracker> newList = new ArrayList<>();
+            newList.add(object);
+            return newList;
         });
     }
 
@@ -44,18 +44,27 @@ public enum ClassTracker {
         }
         var set = map.get(clazz);
         if (set == null) return 0;
-        set.removeIf(value -> value.get() == null);
+        set.removeIf(ObjectTracker::isEmpty);
         return set.size();
     }
 
-    public boolean contains(Object object) {
-        return contains(object.getClass(), object);
-    }
-
-    public boolean contains(Class<?> clazz, Object object) {
-        var set = map.get(clazz);
-        if (set == null) return false;
-        return set.contains(new IdentityWeakReference<>(object));
+    public synchronized void transferTo(ClassTracker tracker, ObjectTracker.ValidClass type) {
+        cleanNulls();
+        this.map.forEach((key, value) -> {
+            if (!type.getClasses().contains(key)) return;
+            for (ObjectTracker objTracker : value) {
+                var objGen = objTracker.getGeneration();
+                var trackerGen = type.getCurrentGeneration();
+                if (!objTracker.isEmpty() &&
+                        objGen.getNumber() != trackerGen.getNumber() &&
+                     objGen.getEvent() != Generation.EvolutionEvent.INIT
+                ) {
+                    if (type == ObjectTracker.ValidClass.INGREDIENT){
+                        if (objGen.getNumber() >= 2) tracker.add(type, objTracker);
+                    } else tracker.add(type, objTracker);
+                }
+            }
+        });
     }
 
     @Override
@@ -74,10 +83,29 @@ public enum ClassTracker {
         return result;
     }
 
-    public void add(LeakDiagTool.ValidClass type, Object object) {
+    public void add(ObjectTracker.ValidClass type, Object object) {
         type.getClasses().stream()
-                .filter(clazz -> clazz.isAssignableFrom(object.getClass()))
-                .forEach(clazz -> add(clazz,object));
+                .filter(clazz -> {
+                    if (object instanceof ObjectTracker wrapped){
+                        return clazz.isAssignableFrom(wrapped.unwrap().getClass());
+                    }
+                    return clazz.isAssignableFrom(object.getClass());
+                })
+                .forEach(clazz -> {
+                    if (object instanceof ObjectTracker wrapped){
+                        add(clazz, wrapped);
+                        return;
+                    }
+                    add(clazz, ObjectTracker.of(object, type));
+                });
+    }
+
+    public void cleanNulls(){
+        System.gc();
+        map.values().forEach(list -> {
+            list.removeIf(ObjectTracker::isEmpty);
+            ((ArrayList<?>) list).trimToSize();
+        });
     }
 
 }

@@ -1,7 +1,5 @@
 package github.uncandango.leakdiagtool;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.TickTask;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -32,7 +30,7 @@ public enum Scheduler {
         return scheduledTasks.getOrDefault(id, null);
     }
 
-    private Future<?> createTask(Runnable task, Long seconds, LogicalSide side) {
+    public Future<?> createTask(Runnable task, Long seconds, LogicalSide side) {
         return getExecutor().schedule(
                 () -> LogicalSidedProvider.WORKQUEUE.get(side)
                         .execute(task), seconds, TimeUnit.SECONDS);

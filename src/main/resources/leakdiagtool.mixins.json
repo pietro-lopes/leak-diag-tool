@@ -7,6 +7,8 @@
   ],
   "mixins": [
     "ChunkAccessMixin",
+    "IngredientMixin",
+    "ItemStackMixin",
     "LevelMixin",
     "MinecraftServerMixin",
     "PlayerMixin"

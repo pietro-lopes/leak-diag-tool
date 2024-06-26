@@ -1,8 +1,8 @@
 package github.uncandango.leakdiagtool.mixin;
 
 import com.mojang.datafixers.DataFixer;
-import github.uncandango.leakdiagtool.LeakDiagTool;
 import github.uncandango.leakdiagtool.tracker.ClassTracker;
+import github.uncandango.leakdiagtool.tracker.ObjectTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
@@ -21,8 +21,6 @@ public class MinecraftServerMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     void ldt$grabServerInstance(Thread thread, LevelStorageSource.LevelStorageAccess arg, PackRepository arg2, WorldStem arg3, Proxy proxy, DataFixer dataFixer, Services arg4, ChunkProgressListenerFactory arg5, CallbackInfo ci) {
-        LeakDiagTool.ValidClass.SERVER.getClasses().forEach(clazz -> {
-            if (clazz.isAssignableFrom(this.getClass())) ClassTracker.LOADED.add(clazz, this);
-        });
+        ObjectTracker.add(ClassTracker.LOADED, ObjectTracker.ValidClass.SERVER, this);
     }
 }
