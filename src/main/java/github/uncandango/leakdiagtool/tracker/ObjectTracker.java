@@ -2,8 +2,8 @@ package github.uncandango.leakdiagtool.tracker;
 
 import github.uncandango.leakdiagtool.Utils;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.common.util.Lazy;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -70,13 +70,13 @@ public class ObjectTracker {
         INGREDIENT(Set.of(RELOAD_RESOURCES), false, "net.minecraft.world.item.crafting.Ingredient"),
         ITEMSTACK(Set.of(RELOAD_RESOURCES), false, "net.minecraft.world.item.ItemStack");
 
-        private final LazyOptional<Set<Class<?>>> classes;
+        private final Lazy<Set<Class<?>>> classes;
         private final boolean stackTrace;
         private final Set<Generation.EvolutionEvent> events;
         private Generation generation;
 
         ValidClass(Set<Generation.EvolutionEvent> events, boolean stackTrace, String... classNames) {
-            this.classes = LazyOptional.of(() -> Stream.of(classNames).map(Utils::safeGetClass).filter(Objects::nonNull).collect(Collectors.toSet()));
+            this.classes = Lazy.of(() -> Stream.of(classNames).map(Utils::safeGetClass).filter(Objects::nonNull).collect(Collectors.toSet()));
             this.generation = new Generation();
             this.stackTrace = stackTrace;
             this.events = events;
@@ -105,7 +105,7 @@ public class ObjectTracker {
         }
 
         public Set<Class<?>> getClasses() {
-            return classes.orElse(Set.of());
+            return classes.get();
         }
     }
 }

@@ -1,13 +1,10 @@
 package github.uncandango.leakdiagtool.events;
 
-import com.mojang.authlib.GameProfile;
 import github.uncandango.leakdiagtool.LeakDiagTool;
 import github.uncandango.leakdiagtool.commands.LDTCommands;
 import github.uncandango.leakdiagtool.tracker.ClassTracker;
 import github.uncandango.leakdiagtool.tracker.ObjectTracker;
-import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -15,9 +12,6 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-
-import java.util.UUID;
 
 import static github.uncandango.leakdiagtool.commands.LDTCommands.heapDumpScheduledOnServerShutdown;
 

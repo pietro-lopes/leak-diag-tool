@@ -16,14 +16,7 @@ public class LeakDiagTool {
 
     public LeakDiagTool(IEventBus eventModBus, ModContainer modContainer) {
         var eventBus = NeoForge.EVENT_BUS;
-        eventBus.addListener(LeakDiagTool::registerCommands);
-        eventBus.addListener(LeakDiagTool::registerClientCommands);
-        eventBus.addListener(LeakDiagTool::unloadLevel);
-        eventBus.addListener(LeakDiagTool::unloadChunk);
-        eventBus.addListener(LeakDiagTool::shutdownServer);
-        eventBus.addListener(LeakDiagTool::playerLogout);
         eventBus.addListener(Scheduler.INSTANCE::onShutdown);
-        eventBus.addListener(LeakDiagTool::closedServer);
 
         if (debugMode) {
             // Fake Player does not handle disconnection properly and leaks

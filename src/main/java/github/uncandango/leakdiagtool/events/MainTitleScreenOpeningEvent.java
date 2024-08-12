@@ -11,6 +11,7 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,7 +56,7 @@ public class MainTitleScreenOpeningEvent extends Event {
         if (!lock.get()) {
             if (tryCheckInstanceOf(event.getScreen()) || tryCheckTranslationKey(event.getScreen())) {
                 lock.set(true);
-                MinecraftForge.EVENT_BUS.post(new MainTitleScreenOpeningEvent(event.getScreen()));
+                NeoForge.EVENT_BUS.post(new MainTitleScreenOpeningEvent(event.getScreen()));
             }
         }
     }

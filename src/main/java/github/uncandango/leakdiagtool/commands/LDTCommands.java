@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.server.command.EnumArgument;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
